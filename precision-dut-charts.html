@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Dutasteride - DHT Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #21262d;
+            --emerald: #10b981;
+            --emerald-dark: #059669;
+            --emerald-light: #34d399;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border: #30363d;
+            --red: #f85149;
+            --orange: #d29922;
+            --blue: #58a6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--emerald-light), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header .badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--emerald);
+            border-radius: 20px;
+            color: var(--emerald-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--emerald);
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--emerald);
+            line-height: 1.2;
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card .sublabel {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-card.highlight {
+            border-color: var(--emerald);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 100%);
+        }
+
+        /* Chart Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--emerald);
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Infographic */
+        .infographic {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .infographic {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .infographic-panel {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .infographic-panel.traditional {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+        }
+
+        .infographic-panel.precision {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .infographic-panel h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .infographic-panel.traditional h3 {
+            color: var(--red);
+        }
+
+        .infographic-panel.precision h3 {
+            color: var(--emerald);
+        }
+
+        .body-icon {
+            margin: 1.5rem auto;
+        }
+
+        .feature-list {
+            text-align: left;
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .feature-list .icon-bad {
+            color: var(--red);
+        }
+
+        .feature-list .icon-good {
+            color: var(--emerald);
+        }
+
+        /* Timeline Chart Labels */
+        .timeline-note {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .timeline-note span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .timeline-note .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .timeline-note .dot.baseline {
+            background: var(--blue);
+        }
+
+        .timeline-note .dot.precision {
+            background: var(--emerald);
+        }
+
+        .timeline-note .dot.oral {
+            background: var(--red);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--emerald);
+            text-decoration: none;
+        }
+
+        /* Data Update Instructions */
+        .update-panel {
+            background: var(--bg-secondary);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .update-panel code {
+            background: var(--bg-card);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--emerald-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Precision Dutasteride</h1>
+            <p class="subtitle">Targeted DHT Inhibition • Scalp-Only Delivery</p>
+            <span class="badge">🧬 HairDAO Research Data</span>
+        </header>
+
+        <!-- Key Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card highlight">
+                <div class="value" id="stat-systemic">~0%</div>
+                <div class="label">Systemic DHT Change</div>
+                <div class="sublabel">Blood serum levels maintained</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-patients">12</div>
+                <div class="label">Participants</div>
+                <div class="sublabel">In current trial</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-days">90</div>
+                <div class="label">Days of Data</div>
+                <div class="sublabel">Treatment duration</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-scalp">✓</div>
+                <div class="label">Scalp Targeting</div>
+                <div class="sublabel">Local DHT inhibition</div>
+            </div>
+        </section>
+
+        <!-- Bar Chart: Systemic DHT Comparison -->
+        <section class="section">
+            <h2 class="section-title">Systemic DHT Reduction Comparison</h2>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="dhtComparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Chart -->
+        <section class="section">
+            <h2 class="section-title">DHT Levels Over Time</h2>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                <div class="timeline-note">
+                    <span><span class="dot baseline"></span> Baseline (100%)</span>
+                    <span><span class="dot precision"></span> Precision Dut</span>
+                    <span><span class="dot oral"></span> Oral Dutasteride</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Side-by-Side Infographic -->
+        <section class="section">
+            <h2 class="section-title">Mechanism Comparison</h2>
+            <div class="infographic">
+                <!-- Traditional Dutasteride -->
+                <div class="infographic-panel traditional">
+                    <h3>❌ Oral Dutasteride</h3>
+                    <svg class="body-icon" width="120" height="180" viewBox="0 0 120 180">
+                        <!-- Body outline -->
+                        <ellipse cx="60" cy="25" rx="20" ry="22" fill="none" stroke="#f85149" stroke-width="2"/>
+                        <!-- Torso -->
+                        <path d="M40 47 L30 90 L35 140 L45 175 L55 175 L60 130 L65 175 L75 175 L85 140 L90 90 L80 47" 
+                              fill="none" stroke="#f85149" stroke-width="2"/>
+                        <!-- Arms -->
+                        <path d="M30 55 L10 100" stroke="#f85149" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M90 55 L110 100" stroke="#f85149" stroke-width="2" stroke-linecap="round"/>
+                        <!-- DHT blocked markers (X marks throughout body) -->
+                        <g fill="#f85149" opacity="0.6">
+                            <text x="55" y="30" font-size="14" font-weight="bold">✕</text>
+                            <text x="55" y="70" font-size="14" font-weight="bold">✕</text>
+                            <text x="55" y="100" font-size="14" font-weight="bold">✕</text>
+                            <text x="55" y="130" font-size="14" font-weight="bold">✕</text>
+                            <text x="15" y="85" font-size="12" font-weight="bold">✕</text>
+                            <text x="95" y="85" font-size="12" font-weight="bold">✕</text>
+                            <text x="40" y="160" font-size="12" font-weight="bold">✕</text>
+                            <text x="70" y="160" font-size="12" font-weight="bold">✕</text>
+                        </g>
+                    </svg>
+                    <ul class="feature-list">
+                        <li><span class="icon-bad">✕</span> 90% systemic DHT reduction</li>
+                        <li><span class="icon-bad">✕</span> Affects entire body</li>
+                        <li><span class="icon-bad">✕</span> Sexual side effects risk</li>
+                        <li><span class="icon-bad">✕</span> Hormonal disruption</li>
+                    </ul>
+                </div>
+
+                <!-- Precision Dutasteride -->
+                <div class="infographic-panel precision">
+                    <h3>✓ Precision Dutasteride</h3>
+                    <svg class="body-icon" width="120" height="180" viewBox="0 0 120 180">
+                        <!-- Body outline -->
+                        <ellipse cx="60" cy="25" rx="20" ry="22" fill="none" stroke="#10b981" stroke-width="2"/>
+                        <!-- Torso -->
+                        <path d="M40 47 L30 90 L35 140 L45 175 L55 175 L60 130 L65 175 L75 175 L85 140 L90 90 L80 47" 
+                              fill="none" stroke="#10b981" stroke-width="2"/>
+                        <!-- Arms -->
+                        <path d="M30 55 L10 100" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M90 55 L110 100" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Hair/scalp highlight with checkmark -->
+                        <path d="M40 10 Q60 -5 80 10" stroke="#10b981" stroke-width="3" fill="none"/>
+                        <circle cx="60" cy="5" r="8" fill="#10b981" opacity="0.3"/>
+                        <text x="56" y="9" font-size="10" fill="#10b981" font-weight="bold">✓</text>
+                        <!-- Body checkmarks (DHT preserved) -->
+                        <g fill="#10b981" opacity="0.4">
+                            <text x="55" y="70" font-size="12">✓</text>
+                            <text x="55" y="100" font-size="12">✓</text>
+                            <text x="55" y="130" font-size="12">✓</text>
+                        </g>
+                    </svg>
+                    <ul class="feature-list">
+                        <li><span class="icon-good">✓</span> ~0% systemic DHT change</li>
+                        <li><span class="icon-good">✓</span> Scalp-targeted delivery</li>
+                        <li><span class="icon-good">✓</span> Preserves hormonal balance</li>
+                        <li><span class="icon-good">✓</span> Minimal side effect profile</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Data visualization by <a href="https://hairdao.xyz" target="_blank">HairDAO</a> • Precision Dutasteride Research</p>
+            <p style="margin-top: 0.5rem;">Last updated: <span id="lastUpdated"></span></p>
+            
+            <div class="update-panel">
+                <strong>📊 To update data:</strong> Edit the <code>DATA</code> object in the script section below, 
+                or run: <code>node update-dht-data.js --systemic=0 --patients=12 --days=90</code>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // 📊 DATA CONFIGURATION - EDIT VALUES HERE
+        // ============================================
+        const DATA = {
+            // Key stats
+            systemicChange: 0,      // % change in systemic DHT (placeholder: 0)
+            patientsCount: 12,      // Number of participants
+            daysOfData: 90,         // Days of treatment data
+            
+            // Timeline data (% of baseline DHT)
+            timeline: {
+                precisionDut: [100, 98, 97, 99],  // Day 0, 30, 60, 90
+                oralDut: [100, 15, 12, 10]        // Comparison: oral dutasteride
+            },
+            
+            // Comparison chart data (% reduction)
+            comparison: {
+                oralDutasteride: 90,
+                oralFinasteride: 70,
+                precisionDutasteride: 0  // placeholder
+            }
+        };
+        // ============================================
+
+        // Update stat cards
+        document.getElementById('stat-systemic').textContent = 
+            DATA.systemicChange === 0 ? '~0%' : `${DATA.systemicChange > 0 ? '+' : ''}${DATA.systemicChange}%`;
+        document.getElementById('stat-patients').textContent = DATA.patientsCount;
+        document.getElementById('stat-days').textContent = DATA.daysOfData;
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Chart.js defaults for dark theme
+        Chart.defaults.color = '#8b949e';
+        Chart.defaults.borderColor = '#30363d';
+
+        // Bar Chart: Systemic DHT Comparison
+        new Chart(document.getElementById('dhtComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Oral Dutasteride', 'Oral Finasteride', 'Precision Dutasteride'],
+                datasets: [{
+                    label: 'Systemic DHT Reduction (%)',
+                    data: [
+                        DATA.comparison.oralDutasteride,
+                        DATA.comparison.oralFinasteride,
+                        DATA.comparison.precisionDutasteride
+                    ],
+                    backgroundColor: [
+                        'rgba(248, 81, 73, 0.8)',
+                        'rgba(210, 153, 34, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderColor: [
+                        '#f85149',
+                        '#d29922',
+                        '#10b981'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.parsed.y}% DHT reduction`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '% DHT Reduction (Systemic)',
+                            color: '#f0f6fc'
+                        },
+                        grid: { color: '#21262d' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Line Chart: Timeline
+        new Chart(document.getElementById('timelineChart'), {
+            type: 'line',
+            data: {
+                labels: ['Baseline', 'Day 30', 'Day 60', 'Day 90'],
+                datasets: [
+                    {
+                        label: 'Precision Dutasteride',
+                        data: DATA.timeline.precisionDut,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        borderWidth: 3
+                    },
+                    {
+                        label: 'Oral Dutasteride (comparison)',
+                        data: DATA.timeline.oralDut,
+                        borderColor: '#f85149',
+                        backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        borderWidth: 3,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}% of baseline`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 120,
+                        title: {
+                            display: true,
+                            text: 'Systemic DHT (% of baseline)',
+                            color: '#f0f6fc'
+                        },
+                        grid: { color: '#21262d' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -2,11 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import { Post, Status } from '@/types/content';
-import PostCard from './PostCard';
+import { PostCard } from './PostCard';
 
 interface CalendarProps {
   posts: Post[];
-  onStatusChange?: (id: string, status: Status) => void;
 }
 
 const platformEmoji: Record<string, string> = {
@@ -17,7 +16,7 @@ const platformEmoji: Record<string, string> = {
   discord: '💬',
 };
 
-export default function Calendar({ posts, onStatusChange }: CalendarProps) {
+export function Calendar({ posts }: CalendarProps) {
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)); // Feb 2026 to match content
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -111,22 +110,22 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
         onClick={() => setSelectedDay(isSelected ? null : dateStr)}
         className={`
           ${isWeekView ? 'min-h-48' : 'min-h-24'} 
-          p-2 border border-zinc-800 rounded-lg cursor-pointer transition-all
+          p-2 border border-gray-200 rounded-lg cursor-pointer transition-all
           ${!isCurrentMonth(date) ? 'opacity-40' : ''}
-          ${isToday(date) ? 'border-emerald-500/50 bg-emerald-500/5' : ''}
-          ${isSelected ? 'ring-2 ring-emerald-500 bg-zinc-800/50' : 'hover:bg-zinc-800/30'}
+          ${isToday(date) ? 'border-purple-500 bg-purple-50' : ''}
+          ${isSelected ? 'ring-2 ring-purple-500 bg-purple-50' : 'hover:bg-gray-50'}
         `}
       >
-        <div className={`text-sm font-medium mb-1 ${isToday(date) ? 'text-emerald-400' : 'text-zinc-400'}`}>
+        <div className={`text-sm font-medium mb-1 ${isToday(date) ? 'text-purple-600' : 'text-gray-600'}`}>
           {date.getDate()}
-          {isWeekView && <span className="ml-1 text-zinc-500">{dayNames[date.getDay()]}</span>}
+          {isWeekView && <span className="ml-1 text-gray-400">{dayNames[date.getDay()]}</span>}
         </div>
         
         <div className="space-y-1">
           {dayPosts.slice(0, isWeekView ? 6 : 3).map(post => (
             <div
               key={post.id}
-              className="text-xs px-1.5 py-0.5 rounded bg-zinc-800/80 truncate flex items-center gap-1"
+              className="text-xs px-1.5 py-0.5 rounded bg-gray-100 truncate flex items-center gap-1"
               title={post.title}
             >
               <span>{platformEmoji[post.platform]}</span>
@@ -134,7 +133,7 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
             </div>
           ))}
           {dayPosts.length > (isWeekView ? 6 : 3) && (
-            <div className="text-xs text-zinc-500 px-1">
+            <div className="text-xs text-gray-400 px-1">
               +{dayPosts.length - (isWeekView ? 6 : 3)} more
             </div>
           )}
@@ -144,23 +143,23 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-gray-900">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </h2>
           <div className="flex gap-1">
             <button
               onClick={() => viewMode === 'month' ? navigateMonth(-1) : navigateWeek(-1)}
-              className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
             >
               ←
             </button>
             <button
               onClick={() => viewMode === 'month' ? navigateMonth(1) : navigateWeek(1)}
-              className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
             >
               →
             </button>
@@ -171,7 +170,7 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
           <button
             onClick={() => setViewMode('week')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              viewMode === 'week' ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+              viewMode === 'week' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             Week
@@ -179,7 +178,7 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
           <button
             onClick={() => setViewMode('month')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              viewMode === 'month' ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+              viewMode === 'month' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             Month
@@ -190,7 +189,7 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
       {/* Day names header */}
       <div className="grid grid-cols-7 gap-2">
         {dayNames.map(day => (
-          <div key={day} className="text-center text-sm font-medium text-zinc-500 py-2">
+          <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
             {day}
           </div>
         ))}
@@ -207,16 +206,12 @@ export default function Calendar({ posts, onStatusChange }: CalendarProps) {
       {/* Selected Day Posts */}
       {selectedDay && postsByDate[selectedDay] && (
         <div className="mt-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Posts for {selectedDay}
           </h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {postsByDate[selectedDay].map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onStatusChange={onStatusChange ? (id, status) => onStatusChange(id, status) : undefined}
-              />
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
         </div>

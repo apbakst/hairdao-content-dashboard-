@@ -8,7 +8,7 @@ interface ExportButtonProps {
   posts: Post[];
 }
 
-export default function ExportButton({ posts }: ExportButtonProps) {
+export function ExportButton({ posts }: ExportButtonProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleExportCSV = () => {

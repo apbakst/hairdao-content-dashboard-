@@ -1,200 +1,192 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Post, Platform, Status } from '@/types/content';
+import { FilterBar } from '@/components/FilterBar';
+import { PostCard } from '@/components/PostCard';
+import { Calendar } from '@/components/Calendar';
+import { ExportButton } from '@/components/ExportButton';
 import { initialPosts } from '@/lib/content-data';
-import PostCard from '@/components/PostCard';
-import FilterBar from '@/components/FilterBar';
-import Calendar from '@/components/Calendar';
-import ExportButton from '@/components/ExportButton';
+import { Platform, Status, ContentType, ProductTag, Post } from '@/types/content';
 
-type ViewMode = 'grid' | 'calendar';
-
-export default function Dashboard() {
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [platform, setPlatform] = useState<Platform>('all');
+export default function Home() {
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [platform, setPlatform] = useState<Platform | 'all'>('all');
   const [status, setStatus] = useState<Status | 'all'>('all');
+  const [type, setType] = useState<ContentType | 'all'>('all');
+  const [product, setProduct] = useState<ProductTag | 'all'>('all');
   const [search, setSearch] = useState('');
 
   const filteredPosts = useMemo(() => {
-    return posts.filter(post => {
-      // Platform filter
+    return initialPosts.filter((post) => {
       if (platform !== 'all' && post.platform !== platform) return false;
-      
-      // Status filter
       if (status !== 'all' && post.status !== status) return false;
-      
-      // Search filter
-      if (search) {
-        const searchLower = search.toLowerCase();
-        const matchesTitle = post.title.toLowerCase().includes(searchLower);
-        const matchesContent = post.content.toLowerCase().includes(searchLower);
-        const matchesRef = post.ref?.toLowerCase().includes(searchLower);
-        if (!matchesTitle && !matchesContent && !matchesRef) return false;
-      }
-      
+      if (type !== 'all' && post.type !== type) return false;
+      if (product !== 'all' && post.product !== product) return false;
+      if (search && !post.title.toLowerCase().includes(search.toLowerCase()) && 
+          !post.content.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [posts, platform, status, search]);
+  }, [platform, status, type, product, search]);
 
-  const handleStatusChange = (id: string, newStatus: Status) => {
-    setPosts(prev => prev.map(post => 
-      post.id === id ? { ...post, status: newStatus } : post
-    ));
-  };
-
-  const handleSchedule = (id: string, date: string, time: string) => {
-    setPosts(prev => prev.map(post => 
-      post.id === id 
-        ? { ...post, scheduledDate: date, scheduledTime: time, status: 'scheduled' as Status }
-        : post
-    ));
-  };
-
+  // Stats by category
   const stats = useMemo(() => {
-    return {
-      total: posts.length,
-      draft: posts.filter(p => p.status === 'draft').length,
-      scheduled: posts.filter(p => p.status === 'scheduled').length,
-      posted: posts.filter(p => p.status === 'posted').length,
-      byPlatform: {
-        twitter: posts.filter(p => p.platform === 'twitter').length,
-        instagram: posts.filter(p => p.platform === 'instagram').length,
-        tiktok: posts.filter(p => p.platform === 'tiktok').length,
-        linkedin: posts.filter(p => p.platform === 'linkedin').length,
-        discord: posts.filter(p => p.platform === 'discord').length,
-      },
-    };
-  }, [posts]);
+    const ugc = initialPosts.filter(p => p.type === 'ugc').length;
+    const authority = initialPosts.filter(p => p.type === 'authority').length;
+    const educational = initialPosts.filter(p => p.type === 'educational').length;
+    const drafts = initialPosts.filter(p => p.status === 'draft').length;
+    const scheduled = initialPosts.filter(p => p.status === 'scheduled').length;
+    const posted = initialPosts.filter(p => p.status === 'posted').length;
+    
+    return { ugc, authority, educational, drafts, scheduled, posted, total: initialPosts.length };
+  }, []);
+
+  // Stats by product
+  const productStats = useMemo(() => {
+    const products: Record<string, number> = {};
+    initialPosts.forEach(p => {
+      if (p.product) {
+        products[p.product] = (products[p.product] || 0) + 1;
+      }
+    });
+    return products;
+  }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <nav className="border-b border-zinc-800 sticky top-0 bg-zinc-950/95 backdrop-blur z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">💇</span>
-              <h1 className="text-xl font-bold">HairDAO Content Dashboard</h1>
+              <span className="text-3xl">💇</span>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">HairDAO Content Dashboard</h1>
+                <p className="text-sm text-gray-500">Manage • Schedule • Track</p>
+              </div>
             </div>
-            
             <div className="flex items-center gap-4">
-              {/* View Toggle */}
-              <div className="flex gap-1 bg-zinc-800 rounded-lg p-1">
+              <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'grid' 
-                      ? 'bg-emerald-600 text-white' 
-                      : 'text-zinc-400 hover:text-white'
+                  onClick={() => setView('list')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    view === 'list' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  📱 Grid
+                  📋 List
                 </button>
                 <button
-                  onClick={() => setViewMode('calendar')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'calendar' 
-                      ? 'bg-emerald-600 text-white' 
-                      : 'text-zinc-400 hover:text-white'
+                  onClick={() => setView('calendar')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    view === 'calendar' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
                   📅 Calendar
                 </button>
               </div>
-
               <ExportButton posts={filteredPosts} />
             </div>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-            <div className="text-2xl font-bold text-white">{stats.total}</div>
-            <div className="text-sm text-zinc-400">Total Posts</div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+            <div className="text-sm text-gray-500">Total Posts</div>
           </div>
-          <div className="bg-zinc-900/50 border border-zinc-700 rounded-xl p-4">
-            <div className="text-2xl font-bold text-zinc-400">{stats.draft}</div>
-            <div className="text-sm text-zinc-500">Drafts</div>
+          <div className="bg-pink-50 rounded-xl p-4 shadow-sm border border-pink-100">
+            <div className="text-2xl font-bold text-pink-600">{stats.ugc}</div>
+            <div className="text-sm text-pink-600">🎥 UGC</div>
           </div>
-          <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-4">
-            <div className="text-2xl font-bold text-amber-400">{stats.scheduled}</div>
-            <div className="text-sm text-amber-500/70">Scheduled</div>
+          <div className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-100">
+            <div className="text-2xl font-bold text-blue-600">{stats.authority}</div>
+            <div className="text-sm text-blue-600">🔬 Authority</div>
           </div>
-          <div className="bg-emerald-900/20 border border-emerald-800/50 rounded-xl p-4">
-            <div className="text-2xl font-bold text-emerald-400">{stats.posted}</div>
-            <div className="text-sm text-emerald-500/70">Posted</div>
+          <div className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-100">
+            <div className="text-2xl font-bold text-green-600">{stats.educational}</div>
+            <div className="text-sm text-green-600">📚 Educational</div>
           </div>
-          <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-4">
-            <div className="text-2xl font-bold text-blue-400">{stats.byPlatform.twitter}</div>
-            <div className="text-sm text-blue-500/70">🐦 Twitter</div>
+          <div className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-100">
+            <div className="text-2xl font-bold text-yellow-600">{stats.drafts}</div>
+            <div className="text-sm text-yellow-600">📝 Drafts</div>
           </div>
-          <div className="bg-pink-900/20 border border-pink-800/50 rounded-xl p-4">
-            <div className="text-2xl font-bold text-pink-400">{stats.byPlatform.instagram}</div>
-            <div className="text-sm text-pink-500/70">📸 Instagram</div>
+          <div className="bg-purple-50 rounded-xl p-4 shadow-sm border border-purple-100">
+            <div className="text-2xl font-bold text-purple-600">{stats.scheduled}</div>
+            <div className="text-sm text-purple-600">📅 Scheduled</div>
           </div>
-          <div className="bg-cyan-900/20 border border-cyan-800/50 rounded-xl p-4">
-            <div className="text-2xl font-bold text-cyan-400">{stats.byPlatform.tiktok}</div>
-            <div className="text-sm text-cyan-500/70">🎵 TikTok</div>
+          <div className="bg-emerald-50 rounded-xl p-4 shadow-sm border border-emerald-100">
+            <div className="text-2xl font-bold text-emerald-600">{stats.posted}</div>
+            <div className="text-sm text-emerald-600">✅ Posted</div>
           </div>
         </div>
 
-        {/* Filters (only in grid view) */}
-        {viewMode === 'grid' && (
-          <div className="mb-6">
-            <FilterBar
-              platform={platform}
-              status={status}
-              search={search}
-              onPlatformChange={setPlatform}
-              onStatusChange={setStatus}
-              onSearchChange={setSearch}
-              postCount={filteredPosts.length}
-            />
-          </div>
-        )}
+        {/* Product Stats Row */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {Object.entries(productStats).map(([prod, count]) => (
+            <button
+              key={prod}
+              onClick={() => setProduct(prod as ProductTag)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                product === prod
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'
+              }`}
+            >
+              {prod === 'anagen-shampoo' && '🧴'}
+              {prod === 'anagen-serum' && '💧'}
+              {prod === 'precision-dut' && '🎯'}
+              {prod === 'clinical-trial' && '🧪'}
+              {prod === 'hairdao-general' && '💇'}
+              {' '}{count}
+            </button>
+          ))}
+          {product !== 'all' && (
+            <button
+              onClick={() => setProduct('all')}
+              className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              ✕ Clear
+            </button>
+          )}
+        </div>
+
+        {/* Filters */}
+        <FilterBar
+          platform={platform}
+          status={status}
+          type={type}
+          product={product}
+          search={search}
+          onPlatformChange={setPlatform}
+          onStatusChange={setStatus}
+          onTypeChange={setType}
+          onProductChange={setProduct}
+          onSearchChange={setSearch}
+        />
 
         {/* Content */}
-        {viewMode === 'grid' ? (
+        {view === 'list' ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredPosts.map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onStatusChange={handleStatusChange}
-                onSchedule={handleSchedule}
-              />
+            {filteredPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
             ))}
-            
             {filteredPosts.length === 0 && (
-              <div className="col-span-full text-center py-12 text-zinc-500">
+              <div className="col-span-full text-center py-12 text-gray-500">
                 No posts match your filters
               </div>
             )}
           </div>
         ) : (
-          <Calendar 
-            posts={posts} 
-            onStatusChange={handleStatusChange}
-          />
+          <Calendar posts={filteredPosts} />
         )}
-      </main>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-800 mt-12 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center text-sm text-zinc-500">
-          <p>HairDAO Content Dashboard • Built with Next.js + Tailwind</p>
-          <p className="mt-1">
-            <a href="https://hairdao.xyz" className="text-emerald-500 hover:text-emerald-400">hairdao.xyz</a>
-            {' • '}
-            <a href="https://github.com/apbakst/hairdao-content-dashboard-" className="text-emerald-500 hover:text-emerald-400">GitHub</a>
-          </p>
+        {/* Footer */}
+        <div className="mt-8 text-center text-sm text-gray-400">
+          Last updated: {new Date().toLocaleDateString()} • {filteredPosts.length} posts shown
         </div>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }

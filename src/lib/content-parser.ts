@@ -132,37 +132,48 @@ export function parseCalendar(markdown: string): Post[] {
   return posts;
 }
 
+// New 3-category system:
+// - ugc: User-generated content, community highlights, memes, testimonials
+// - authority: Scientific content, medical updates, clinical trial data, research
+// - educational: Explainers, how-tos, myth-busting, treatment info
+
 function inferContentType(title: string, content: string): ContentType {
   const combined = (title + ' ' + content).toLowerCase();
   
-  if (combined.includes('meme') || combined.includes('humor') || combined.includes('pov:') || combined.includes('joke')) {
-    return 'humor';
+  // UGC / Community - user content, testimonials, memes, community stuff
+  if (combined.includes('meme') || combined.includes('community') || combined.includes('repost') || 
+      combined.includes('testimonial') || combined.includes('user') || combined.includes('member') ||
+      combined.includes('spotlight') || combined.includes('ugc') || combined.includes('results') ||
+      combined.includes('before') || combined.includes('after')) {
+    return 'ugc';
   }
-  if (combined.includes('trial') || combined.includes('recruit') || combined.includes('apply')) {
-    return 'community';
+  
+  // Authority - scientific, medical, research, clinical trials, data
+  if (combined.includes('study') || combined.includes('research') || combined.includes('trial') || 
+      combined.includes('data') || combined.includes('clinical') || combined.includes('fda') ||
+      combined.includes('scientific') || combined.includes('medical') || combined.includes('lab') ||
+      combined.includes('pharmacokinetics') || combined.includes('mechanism')) {
+    return 'authority';
   }
-  if (combined.includes('product') || combined.includes('buy') || combined.includes('order') || combined.includes('lexy')) {
-    return 'product';
-  }
-  if (combined.includes('results') || combined.includes('before') || combined.includes('after') || combined.includes('glow')) {
-    return 'results';
-  }
-  if (combined.includes('routine') || combined.includes('day in') || combined.includes('lifestyle')) {
-    return 'lifestyle';
-  }
+  
+  // Educational - everything else (explainers, how-tos, etc.)
   return 'educational';
 }
 
 function mapContentType(type: string): ContentType {
   const lower = type.toLowerCase();
-  if (lower.includes('education')) return 'educational';
-  if (lower.includes('product') || lower.includes('promo')) return 'product';
-  if (lower.includes('community') || lower.includes('trial')) return 'community';
-  if (lower.includes('humor') || lower.includes('meme')) return 'humor';
-  if (lower.includes('result') || lower.includes('glow')) return 'results';
-  if (lower.includes('lifestyle') || lower.includes('routine')) return 'lifestyle';
-  if (lower.includes('engagement') || lower.includes('poll')) return 'engagement';
-  if (lower.includes('bts') || lower.includes('behind')) return 'bts';
+  
+  // Map to new 3-category system
+  if (lower.includes('ugc') || lower.includes('community') || lower.includes('meme') || 
+      lower.includes('humor') || lower.includes('result') || lower.includes('testimonial')) {
+    return 'ugc';
+  }
+  if (lower.includes('authority') || lower.includes('scientific') || lower.includes('research') || 
+      lower.includes('medical') || lower.includes('trial') || lower.includes('study')) {
+    return 'authority';
+  }
+  
+  // Default to educational
   return 'educational';
 }
 
