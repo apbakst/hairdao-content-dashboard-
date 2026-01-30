@@ -1,0 +1,110 @@
+{
+  "trends": [
+    {
+      "source": "pubmed",
+      "pmid": "41614228",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41614228/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.150Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41614041",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41614041/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.150Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41613336",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41613336/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.150Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41612696",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41612696/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.150Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41611183",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41611183/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.150Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41614228",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41614228/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.356Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41614041",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41614041/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.356Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41613336",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41613336/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.356Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41611248",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41611248/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.356Z",
+      "score": 30,
+      "category": "authority"
+    },
+    {
+      "source": "pubmed",
+      "pmid": "41611183",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41611183/",
+      "type": "new_study",
+      "founderVideo": false,
+      "scrapedAt": "2026-01-30T14:30:16.356Z",
+      "score": 30,
+      "category": "authority"
+    }
+  ],
+  "lastScout": "2026-01-30T14:30:16.357Z",
+  "stats": {
+    "total": 10,
+    "new": 10,
+    "founderVideoOpportunities": 0
+  }
+}

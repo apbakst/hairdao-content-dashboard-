@@ -1,0 +1,47 @@
+{
+  "posts": [
+    {
+      "id": "swarm-ml0zcqxd-gfvvb",
+      "title": "Data Deep Dive: Hair Loss",
+      "content": "Let's look at the data 📈\n\n{data_point}\n\nWhat this tells us:\n{analysis}\n\nThread continues 🧵",
+      "platform": "tiktok",
+      "type": "authority",
+      "status": "draft",
+      "product": "anagen-shampoo",
+      "createdAt": "2026-01-30",
+      "sourceTrend": "https://pubmed.ncbi.nlm.nih.gov/41614228/",
+      "videoType": "remotion",
+      "videoStatus": "pending",
+      "videoNotes": null
+    },
+    {
+      "id": "swarm-ml0zcqxd-el7w4",
+      "title": "New Research: Hair Loss",
+      "content": "🧬 New study just dropped\n\n{summary}\n\nKey finding:\n{finding}\n\nWhat this means for treatment:\n{implication}\n\nSource: {source}",
+      "platform": "instagram",
+      "type": "authority",
+      "status": "draft",
+      "product": "anagen-shampoo",
+      "createdAt": "2026-01-30",
+      "sourceTrend": "https://pubmed.ncbi.nlm.nih.gov/41614041/",
+      "videoType": "founder",
+      "videoStatus": "pending",
+      "videoNotes": null
+    },
+    {
+      "id": "swarm-ml0zcqxd-zdtat",
+      "title": "Trial Update: {trial}",
+      "content": "📊 {trial} Update\n\n{stats}\n\nLatest observations:\n{observations}\n\nFull data: hairdao.xyz/trials",
+      "platform": "twitter",
+      "type": "authority",
+      "status": "draft",
+      "product": "clinical-trial",
+      "createdAt": "2026-01-30",
+      "sourceTrend": "https://pubmed.ncbi.nlm.nih.gov/41613336/",
+      "videoType": "remotion",
+      "videoStatus": "pending",
+      "videoNotes": null
+    }
+  ],
+  "lastSwarm": "2026-01-30T14:30:20.499Z"
+}
